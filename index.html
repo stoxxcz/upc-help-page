@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UPC IDE — Справка по языку UPC</title>
+    <title>UPC IDE — Полный справочник по языку UPC</title>
     <style>
         :root {
             --primary: #3498db;
@@ -41,6 +41,12 @@
             margin-top: 40px;
             padding-left: 10px;
             border-left: 4px solid var(--accent);
+        }
+        
+        h3 {
+            color: var(--accent);
+            font-size: 1.4em;
+            margin-top: 30px;
         }
         
         b {
@@ -119,19 +125,40 @@
         }
         
         .version {
-    font-size: 0.7em;
-    color: #95a5a6;
-    margin-left: 8px;
-    font-weight: normal;
-    letter-spacing: 1px;
-    position: relative;
-    top: -2px;
+            font-size: 0.7em;
+            color: #95a5a6;
+            margin-left: 8px;
+            font-weight: normal;
+            letter-spacing: 1px;
+            position: relative;
+            top: -2px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        th {
+            background-color: var(--code-bg);
+            color: var(--accent);
+        }
+        
+        tr:hover {
+            background-color: rgba(44, 62, 80, 0.3);
         }
     </style>
 </head>
 <body>
-    <h1>UPC IDE <span class="version">1.0</span></h1>
-    <h2 style="text-align: center; color: var(--accent); border: none;">Подробная справка по языку UPC</h2>
+    <h1>UPC IDE <span class="version">alpha (0.1)</span></h1>
+    <h2 style="text-align: center; color: var(--accent); border: none;">Полный справочник по языку UPC</h2>
     
     <div class="tip">
         <b>Что такое UPC?</b><br>
@@ -142,130 +169,337 @@
 
     <hr>
 
-    <h2>Основные команды UPC</h2>
+    <h2>Основные команды</h2>
     
     <div class="command">
         <b>patch</b> — объявляет начало патча и его версию.<br>
         <div class="example">
-            <i>пример:</i><br>
-            <code>patch 1.0</code><br>
-            Описывает патч версии 1.0.
+            <i>синтаксис:</i> <code>patch &lt;версия&gt;</code><br>
+            <i>пример:</i> <code>patch 1.0</code>
         </div>
     </div>
     
     <div class="command">
-        <b>description</b> — описание патча (текст).<br>
+        <b>description</b> — устанавливает описание патча.<br>
         <div class="example">
-            <i>пример:</i><br>
-            <code>description "исправление ошибки загрузки"</code>
-        </div>
-    </div>
-    
-    <div class="command">
-        <b>replace</b> <i>"файл.file"</i>, <i>"старый_текст"</i> to <i>"новый_текст"</i><br>
-        Заменяет в указанном файле все вхождения <i>старого_текста</i> на <i>новый_текст</i>.<br>
-        Если файл не указан, замена происходит в основном файле патча (если такой есть).<br>
-        <div class="example">
-            <i>пример:</i><br>
-            <code>replace "config.ini", "Hello" to "Привет"</code>
-        </div>
-    </div>
-    
-    <div class="command">
-        <b>delete</b> <i>"файл.file"</i> <i>"текст"</i><br>
-        Удаляет указанную строку из указанного файла.<br>
-        Если файл не указан, удаление происходит в основном файле патча.<br>
-        <div class="example">
-            <i>пример:</i><br>
-            <code>delete "config.ini" "debug_mode=1"</code><br>
-            Или<br>
-            <code>delete "debug_mode=1"</code> — удаление из основного файла.
-        </div>
-    </div>
-    
-    <div class="command">
-        <b>copy</b> <i>источник</i> to <i>назначение</i><br>
-        Копирует файл.<br>
-        <div class="example">
-            <i>пример:</i><br>
-            <code>copy "backup.ini" to "config.ini"</code>
-        </div>
-    </div>
-    
-    <div class="command">
-        <b>create</b> <i>путь_к_файлу</i><br>
-        Создаёт новый файл с содержимым, записанным в блоке.<br>
-        <div class="example">
-            <i>пример:</i><br>
-            <pre>
-create "new_script.py"
-(
-    print("привет мир")
-    print("это новый скрипт")
-)
-ce</pre>
-        </div>
-        <div class="note">
-            <b>Примечание:</b> <code>ce</code> — команда окончания блока создания.
-        </div>
-    </div>
-    
-    <div class="command">
-        <b>embed</b> [(create)] <i>"имя_файла"</i> type base64<br>
-        Встраивает бинарный файл в патч в формате base64.<br>
-        Если указан флаг <b>create</b>, то создаёт этот файл при применении патча.<br>
-        <div class="example">
-            <i>пример:</i><br>
-            <pre>
-embed create "image.png" type base64
-(
-iVBORw0KGgoAAAANSUhEUgAA...
-)
-ce</pre>
-        </div>
-    </div>
-    
-    <div class="command">
-        <b>exec_if</b> <i>условие</i> ( <i>блок_команд</i> )<br>
-        Выполняет блок команд, если условие истинно.<br>
-        <div class="example">
-            <i>пример:</i><br>
-            <pre>
-exec_if file_exists "plugin.dll" (
-  message "плагин уже установлен"
-  stop
-)</pre>
+            <i>синтаксис:</i> <code>description "текст"</code><br>
+            <i>пример:</i> <code>description "Исправление ошибки загрузки"</code>
         </div>
     </div>
 
     <hr>
 
-    <h2>Пример полного патча</h2>
+    <h2>Файловые операции</h2>
     
-    <pre>
-patch 1.0
-description "пример расширенного патча с заменой, созданием и embed"
-
-replace "config.ini", "Hello" to "Привет"
-
-create "hello.py"
+    <div class="command">
+        <b>replace</b> — заменяет текст в файле.<br>
+        <div class="example">
+            <i>синтаксис:</i> <code>replace ["файл"], "старый_текст" to "новый_текст"</code><br>
+            <i>пример:</i> <code>replace "config.ini", "Hello" to "Привет"</code>
+        </div>
+    </div>
+    
+    <div class="command">
+        <b>delete</b> — удаляет строку из файла.<br>
+        <div class="example">
+            <i>синтаксис:</i> <code>delete ["файл"] "текст"</code><br>
+            <i>пример:</i> <code>delete "config.ini" "debug_mode=1"</code>
+        </div>
+    </div>
+    
+    <div class="command">
+        <b>create</b> — создает новый файл.<br>
+        <div class="example">
+            <i>синтаксис:</i> <code>create "путь_к_файлу" ( содержимое ) ce</code><br>
+            <i>пример:</i>
+            <pre>create "script.py"
 (
-print("привет мир!")
+print("Hello World")
 )
-ce
+ce</pre>
+        </div>
+    </div>
+    
+    <div class="command">
+        <b>copy</b> — копирует файл.<br>
+        <div class="example">
+            <i>синтаксис:</i> <code>copy "источник" to "назначение"</code><br>
+            <i>пример:</i> <code>copy "backup.ini" to "config.ini"</code>
+        </div>
+    </div>
+    
+    <div class="command">
+        <b>move</b> — перемещает файл.<br>
+        <div class="example">
+            <i>синтаксис:</i> <code>move "источник" to "назначение"</code><br>
+            <i>пример:</i> <code>move "old.txt" to "new.txt"</code>
+        </div>
+    </div>
+    
+    <div class="command">
+        <b>rename</b> — переименовывает файл.<br>
+        <div class="example">
+            <i>синтаксис:</i> <code>rename "старое_имя" to "новое_имя"</code><br>
+            <i>пример:</i> <code>rename "old.txt" to "new.txt"</code>
+        </div>
+    </div>
+    
+    <div class="command">
+        <b>backup</b> — создает резервную копию файла.<br>
+        <div class="example">
+            <i>синтаксис:</i> <code>backup "файл"</code><br>
+            <i>пример:</i> <code>backup "config.ini"</code>
+        </div>
+    </div>
 
-embed create "image.png" type base64
+    <hr>
+
+    <h2>Работа с директориями</h2>
+    
+    <div class="command">
+        <b>mkdir</b> — создает директорию.<br>
+        <div class="example">
+            <i>синтаксис:</i> <code>mkdir "путь"</code><br>
+            <i>пример:</i> <code>mkdir "logs/2023"</code>
+        </div>
+    </div>
+    
+    <div class="command">
+        <b>rmdir</b> — удаляет пустую директорию.<br>
+        <div class="example">
+            <i>синтаксис:</i> <code>rmdir "путь"</code><br>
+            <i>пример:</i> <code>rmdir "temp"</code>
+        </div>
+    </div>
+
+    <hr>
+
+    <h2>Архивация</h2>
+    
+    <div class="command">
+        <b>zip</b> — создает ZIP-архив.<br>
+        <div class="example">
+            <i>синтаксис:</i> <code>zip "архив.zip" add "файл1" [add "файл2"...]</code><br>
+            <i>пример:</i> <code>zip "backup.zip" add "data.db" add "config.ini"</code>
+        </div>
+    </div>
+    
+    <div class="command">
+        <b>unzip</b> — распаковывает ZIP-архив.<br>
+        <div class="example">
+            <i>синтаксис:</i> <code>unzip "архив.zip" to "папка"</code><br>
+            <i>пример:</i> <code>unzip "update.zip" to "temp/"</code>
+        </div>
+    </div>
+
+    <hr>
+
+    <h2>Системные команды</h2>
+    
+    <div class="command">
+        <b>run</b> — выполняет системную команду.<br>
+        <div class="example">
+            <i>синтаксис:</i> <code>run "команда"</code><br>
+            <i>пример:</i> <code>run "python setup.py"</code>
+        </div>
+    </div>
+    
+    <div class="command">
+        <b>start</b> — запускает файл или команду.<br>
+        <div class="example">
+            <i>синтаксис:</i> <code>start "команда_или_файл"</code><br>
+            <i>пример:</i> <code>start "app.exe"</code>
+        </div>
+    </div>
+    
+    <div class="command">
+        <b>download</b> — скачивает файл из интернета.<br>
+        <div class="example">
+            <i>синтаксис:</i> <code>download "url" to "файл"</code><br>
+            <i>пример:</i> <code>download "https://example.com/file.exe" to "file.exe"</code>
+        </div>
+    </div>
+    
+    <div class="command">
+        <b>env</b> — работа с переменными окружения.<br>
+        <div class="example">
+            <i>синтаксис:</i> <code>env set|get "переменная" ["значение"]</code><br>
+            <i>примеры:</i>
+            <pre>env set "PATH" "%PATH%;C:\tools"
+env get "JAVA_HOME"</pre>
+        </div>
+    </div>
+
+    <hr>
+
+    <h2>Управление выполнением</h2>
+    
+    <div class="command">
+        <b>if</b> — условное выполнение.<br>
+        <div class="example">
+            <i>синтаксис:</i> <code>if &lt;условие&gt; then &lt;команда&gt;</code><br>
+            <i>пример:</i> <code>if file_exists "config.ini" then message "Файл найден"</code>
+        </div>
+    </div>
+    
+    <div class="command">
+        <b>exec_if</b> — условное выполнение блока команд.<br>
+        <div class="example">
+            <i>синтаксис:</i> <code>exec_if &lt;условие&gt; ( команды )</code><br>
+            <i>пример:</i>
+            <pre>exec_if os_is "windows" (
+    message "Обнаружена Windows"
+    run "setup.exe"
+)</pre>
+        </div>
+    </div>
+    
+    <div class="command">
+        <b>wait</b> — пауза в выполнении.<br>
+        <div class="example">
+            <i>синтаксис:</i> <code>wait &lt;мс&gt;</code><br>
+            <i>пример:</i> <code>wait 2000  # Ждет 2 секунды</code>
+        </div>
+    </div>
+
+    <hr>
+
+    <h2>Дополнительные команды</h2>
+    
+    <div class="command">
+        <b>message</b> — выводит сообщение пользователю.<br>
+        <div class="example">
+            <i>синтаксис:</i> <code>message "текст"</code><br>
+            <i>пример:</i> <code>message "Патч успешно установлен"</code>
+        </div>
+    </div>
+    
+    <div class="command">
+        <b>log</b> — записывает в лог-файл.<br>
+        <div class="example">
+            <i>синтаксис:</i> <code>log "файл" "текст"</code><br>
+            <i>пример:</i> <code>log "install.log" "Начало установки"</code>
+        </div>
+    </div>
+    
+    <div class="command">
+        <b>checksum</b> — проверяет контрольную сумму.<br>
+        <div class="example">
+            <i>синтаксис:</i> <code>checksum "файл" md5|sha256 "сумма"</code><br>
+            <i>пример:</i> <code>checksum "file.exe" sha256 "a1b2c3..."</code>
+        </div>
+    </div>
+    
+    <div class="command">
+        <b>embed</b> — встраивает бинарный файл.<br>
+        <div class="example">
+            <i>синтаксис:</i> <code>embed [create] "файл" type base64 ( данные ) ce</code><br>
+            <i>пример:</i>
+            <pre>embed create "image.png" type base64
 (
 iVBORw0KGgoAAAANSUhEUgAA...
 )
-ce
+ce</pre>
+        </div>
+    </div>
 
-message "патч успешно применён!"
+    <hr>
 
-exec_if file_exists "plugin.dll" (
-  message "плагин уже установлен"
-  stop
+    <h2>Условия для UPC-патчей</h2>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Условие</th>
+                <th>Описание</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>file_exists "путь"</code></td>
+                <td>Существует ли файл</td>
+            </tr>
+            <tr>
+                <td><code>file_not_exists "путь"</code></td>
+                <td>Не существует ли файл</td>
+            </tr>
+            <tr>
+                <td><code>dir_exists "путь"</code></td>
+                <td>Существует ли папка</td>
+            </tr>
+            <tr>
+                <td><code>dir_not_exists "путь"</code></td>
+                <td>Не существует ли папка</td>
+            </tr>
+            <tr>
+                <td><code>env_exists "VAR"</code></td>
+                <td>Установлена ли переменная окружения</td>
+            </tr>
+            <tr>
+                <td><code>env_not_exists "VAR"</code></td>
+                <td>Не установлена ли переменная окружения</td>
+            </tr>
+            <tr>
+                <td><code>env_equals "VAR" "значение"</code></td>
+                <td>Переменная окружения равна значению</td>
+            </tr>
+            <tr>
+                <td><code>env_not_equals "VAR" "значение"</code></td>
+                <td>Переменная окружения НЕ равна значению</td>
+            </tr>
+            <tr>
+                <td><code>file_contains "файл" "строка"</code></td>
+                <td>Файл содержит указанную строку</td>
+            </tr>
+            <tr>
+                <td><code>file_not_contains "файл" "строка"</code></td>
+                <td>Файл НЕ содержит строку</td>
+            </tr>
+            <tr>
+                <td><code>file_size_gt "файл" байты</code></td>
+                <td>Размер файла больше указанного числа</td>
+            </tr>
+            <tr>
+                <td><code>file_size_lt "файл" байты</code></td>
+                <td>Размер файла меньше указанного числа</td>
+            </tr>
+            <tr>
+                <td><code>os_is "windows"/"linux"/"mac"</code></td>
+                <td>Проверка операционной системы</td>
+            </tr>
+            <tr>
+                <td><code>true</code> / <code>false</code></td>
+                <td>Безусловное да или нет (удобно для отладки)</td>
+            </tr>
+            <tr>
+                <td><code>path_exists "путь"</code></td>
+                <td>Существует ли папка</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Примеры использования условий</h3>
+    
+    <div class="example">
+        <pre>if file_contains "config.ini" "debug=true" then message "Отладка включена"</pre>
+    </div>
+    
+    <div class="example">
+        <pre>exec_if env_equals "MODE" "release" (
+  message "Релизная сборка"
+  run "clean_temp.bat"
 )</pre>
+    </div>
+    
+    <div class="example">
+        <pre>exec_if file_size_gt "data.bin" 100000 (
+  message "Файл data.bin большой"
+)</pre>
+    </div>
+    
+    <div class="example">
+        <pre>if os_is "linux" then message "Работает в Linux"</pre>
+    </div>
 
     <hr>
 
